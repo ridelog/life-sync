@@ -1,0 +1,6 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {validateEntry,filterEntries} from '../lib/life-sync.ts';
+test('health requires at least one optional field; invalid weights rejected',()=>{assert.throws(()=>validateEntry({id:'a',petId:'p',kind:'health',date:'2026-10-08'}));assert.throws(()=>validateEntry({id:'a',petId:'p',kind:'health',date:'2026-10-08',weight:'-1'}));assert.throws(()=>validateEntry({id:'a',petId:'p',kind:'health',date:'2026-10-08',weight:'oops'}));assert.equal(validateEntry({id:'a',petId:'p',kind:'health',date:'2026-10-08',note:'元気'}).note,'元気');});
+test('graph period filters include boundary and separate pets and future dates',()=>{const records=['2026-10-01','2026-10-02','2026-10-08','2026-10-09'].map((date,i)=>({id:String(i),petId:'p',kind:'health' as const,date,weight:'20'}));records.push({id:'other',petId:'q',kind:'health',date:'2026-10-08',weight:'10'});assert.deepEqual(filterEntries(records,'p',7,'2026-10-08').map(r=>r.date),['2026-10-02','2026-10-08']);});
+test('diary can be photo only and blank entry is rejected',()=>{assert.throws(()=>validateEntry({id:'a',petId:'p',kind:'diary',date:'2026-10-08'}));assert.equal(validateEntry({id:'a',petId:'p',kind:'diary',date:'2026-10-08',media:[{path:'p/photo',type:'image/png'}]}).media?.length,1);});
