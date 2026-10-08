@@ -43,6 +43,10 @@
   ],
   "exclude": [
     "node_modules",
-    "examples"
+    "examples",
+    "vite.config.ts",
+    "build",
+    "scripts",
+    "vendor"
   ]
 }
